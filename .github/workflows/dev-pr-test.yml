@@ -3,7 +3,7 @@ name: Upbrella DEV PR Test
 on:
   pull_request:
     branches: [ "dev", "chore/#60-pr-test-automation" ]
-# 테스트 주석
+
 permissions:
   contents: read
 
@@ -24,7 +24,7 @@ jobs:
     - name: Set application properties
       run: |
         touch src/main/resources/application.properties
-        echo "${{ secrets.APPLICATION_PROPERTIES }}" | base64 --decode > src/main/resources/application.properties
+        echo "${{ secrets.APPLICATION_PROPERTIES_DEV }}" | base64 --decode > src/main/resources/application.properties
      
     - name: Test with Gradle
       run: |
@@ -36,3 +36,9 @@ jobs:
       if: ${{ always() }}
       with:
         files: 'build/test-results/**/*.xml'
+
+    - name: 🐳 테스트 실패 Comment
+      uses: mikepenz/action-junit-report@v3
+      if: always()
+      with:
+        report_paths: 'build/test-results/test/TEST-*.xml'
